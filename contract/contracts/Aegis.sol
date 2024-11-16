@@ -118,10 +118,15 @@ contract Aegis is ERC1155 {
         require(sent, "Failed to send Ether");
     }
 
-    function updateMerkleRoot(uint256 keyId, bytes32 merkleRoot) public onlyOwner {
+    function updateMerkleRoot(uint256 keyId, bytes32 merkleRoot) public {
         require(keyId < keyIndex, "Key does not exist");
         keys[keyId].merkleRoot = merkleRoot;
         emit MerkleRootUpdated(keyId, merkleRoot);
+    }
+
+    function getMerkleRoot(uint256 keyId) public view returns (bytes32) {
+        require(keyId < keyIndex, "Key does not exist");
+        return keys[keyId].merkleRoot;
     }
 
     function verifyMerkle(
