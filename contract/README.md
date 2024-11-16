@@ -16,9 +16,11 @@ npx hardhat run scripts/update.ts --network sepolia
 
 npx hardhat run scripts/deploy.ts --network scrollDevnet
 npx hardhat run scripts/scroll.ts --network scrollDevnet
+npx hardhat run scripts/deploy.ts --network fhenix
 ```
 
 Deployed testnet contract: 
 
 Sepolia: 0xC52e4027129AFBBEb672512107EA2E2B251F7EDd
-Scroll Devnet: 0x6C566F193656f69a54A7dabCc832CF0001E880dB
+Scroll Devnet: 0x25B6F252eCed1a26A9192EC35C6a83d1fa355843
+Fhenix: 0x6C566F193656f69a54A7dabCc832CF0001E880dB

@@ -15,10 +15,15 @@ module.exports = {
       accounts: [PRIVATE_KEY]
     },
     scrollDevnet: {
-      url: "https://l1sload-rpc.scroll.io",
+      url: "https://l1sload-rpc.scroll.io", 
       accounts: [PRIVATE_KEY],
       chainId: 2227728
       // https://l1sload-blockscout.scroll.io
+    },
+    fhenix: {
+      url: "https://api.nitrogen.fhenix.zone/",
+      accounts: [PRIVATE_KEY],
+      chainId: 8008148
     }
   }
 };
