@@ -2,9 +2,21 @@
 
 import { ConnectKitButton } from "connectkit";
 import Link from "next/link";
-import { Repeat, Activity, Wallet } from "lucide-react";
+import { Repeat, Activity, Wallet, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
+  const pathname = usePathname();
+
+  const isTradeActive = pathname.startsWith('/swap') || pathname.startsWith('/pools');
+
   return (
     <header className="border-b flex justify-center border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -17,17 +29,44 @@ const Header = () => {
 
           {/* 平铺菜单 */}
           <nav className="flex items-center gap-6">
-            <Link 
-              href="/swap" 
-              className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
-            >
-              <Repeat size={20} />
-              <span>Swap</span>
-            </Link>
+            {/* Trade 下拉菜单 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary outline-none">
+                <span className={cn(
+                  "flex items-center gap-2",
+                  isTradeActive && "text-primary"
+                )}>
+                  <Repeat size={20} />
+                  <span>Trade</span>
+                  <ChevronDown size={16} />
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[160px]">
+                <Link href="/swap">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Repeat size={16} />
+                      <span>Swap</span>
+                    </div>
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/pools">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Activity size={16} />
+                      <span>Pools</span>
+                    </div>
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <Link 
               href="/status" 
-              className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
+              className={cn(
+                "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/status" && "text-primary"
+              )}
             >
               <Activity size={20} />
               <span>Status</span>
@@ -35,7 +74,10 @@ const Header = () => {
             
             <Link 
               href="/balance" 
-              className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
+              className={cn(
+                "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/balance" && "text-primary"
+              )}
             >
               <Wallet size={20} />
               <span>Balance</span>
