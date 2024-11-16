@@ -53,26 +53,24 @@ export default function PoolsPage() {
 
   return (
     <div className="container mx-auto max-w-5xl py-8">
-      {/* 头部 */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">流动性池</h1>
+        <h1 className="text-2xl font-semibold">Pools</h1>
         <Button className="rounded-full">
-          创建新池
+          Create Pool
         </Button>
       </div>
 
-      {/* 搜索和筛选 */}
       <Card className="p-4 mb-6">
         <div className="flex gap-4">
           <div className="relative flex-1">
             <Input 
-              placeholder="搜索代币对" 
+              placeholder="Search Paris" 
               className="pl-10"
             />
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           </div>
           <Button variant="outline">
-            筛选
+            Search
           </Button>
         </div>
       </Card>
@@ -81,9 +79,9 @@ export default function PoolsPage() {
       <Card>
         {/* 表头 */}
         <div className="grid grid-cols-6 gap-4 p-4 border-b text-sm font-medium text-muted-foreground">
-          <div className="col-span-2">池</div>
+          <div className="col-span-2">Pool</div>
           <div>TVL</div>
-          <div>24h交易量</div>
+          <div>24H Volume</div>
           <div>APY</div>
           <div></div>
         </div>
@@ -109,7 +107,7 @@ export default function PoolsPage() {
             <div className="text-green-600">{pool.apy}</div>
             <div className="flex justify-end">
               <Button variant="outline" size="sm">
-                添加流动性
+                Add Liquidity
               </Button>
             </div>
           </Link>

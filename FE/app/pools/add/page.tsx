@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TokenETH, TokenUSDC, TokenUSDT, TokenDAI, IconComponentProps } from '@web3icons/react';
-import { ArrowLeft, ChevronDown, Settings, ArrowDown, Check, Search } from "lucide-react";
+import { ArrowLeft, ChevronDown, Settings, ArrowDown, Check, Search, X } from "lucide-react";
 import Link from "next/link";
 import { ForwardRefExoticComponent, RefAttributes, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -102,12 +102,10 @@ export default function AddLiquidityPage() {
     setShowTokenList(false);
   };
 
-  // 处理添加流动性
   const handleAddLiquidity = () => {
     setShowConfirm(true);
   };
 
-  // 处理确认
   const handleConfirm = async () => {
     try {
       // TODO: 实际的添加流动性逻辑
@@ -129,7 +127,7 @@ export default function AddLiquidityPage() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <h2 className="text-xl font-semibold">添加流动性</h2>
+            <h2 className="text-xl font-semibold">Add Liquidity</h2>
           </div>
           <Button variant="ghost" size="icon">
             <Settings className="h-5 w-5" />
@@ -162,21 +160,19 @@ export default function AddLiquidityPage() {
               </Button>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>余额: {token0.balance}</span>
+              <span>Balance: {token0.balance}</span>
               <Button variant="ghost" size="sm" className="h-auto p-0">
-                最大
+                MAX
               </Button>
             </div>
           </div>
 
-          {/* 加号 */}
           <div className="flex justify-center">
             <div className="bg-background rounded-full p-2">
               <ArrowDown className="h-4 w-4" />
             </div>
           </div>
 
-          {/* 第二个代币输入 */}
           <div className="rounded-2xl bg-muted p-4">
             <div className="flex justify-between mb-2">
               <Input
@@ -200,9 +196,9 @@ export default function AddLiquidityPage() {
               </Button>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>余额: {token1.balance}</span>
+              <span>Balance: {token1.balance}</span>
               <Button variant="ghost" size="sm" className="h-auto p-0">
-                最大
+                Max
               </Button>
             </div>
           </div>
@@ -214,18 +210,30 @@ export default function AddLiquidityPage() {
           size="lg"
           onClick={handleAddLiquidity}
         >
-          添加流动性
+          Add Liquidity
         </Button>
 
         {/* Token List Modal */}
         <Dialog open={showTokenList} onOpenChange={setShowTokenList}>
           <DialogContent className="max-w-[400px] p-0">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">选择代币</h2>
+              {/* 标题和关闭按钮行 */}
+              <div className="flex items-center mb-4">
+                <h2 className="text-xl font-semibold">Choose Token</h2>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="ml-auto"
+                  onClick={() => setShowTokenList(false)}
+                >
+                </Button>
+              </div>
+
+              {/* Token List 选择器独立一行 */}
+              <div className="mb-4">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="ml-auto">
+                    <Button variant="outline" className="w-full">
                       {selectedList.name}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
@@ -247,17 +255,17 @@ export default function AddLiquidityPage() {
                 </DropdownMenu>
               </div>
 
+              {/* 搜索框和其他内容保持不变 */}
               <div className="relative mb-4">
                 <Input 
-                  placeholder="搜索代币名称或地址" 
+                  placeholder="Search Token or Contract Address" 
                   className="pl-10"
                 />
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               </div>
 
-              {/* 常用代币快捷选择 */}
               <div className="mb-4">
-                <div className="text-sm text-muted-foreground mb-2">常用代币</div>
+                <div className="text-sm text-muted-foreground mb-2">Common Tokens</div>
                 <div className="flex flex-wrap gap-2">
                   {selectedList.tokens.slice(0, 4).map((token) => (
                     <Button
