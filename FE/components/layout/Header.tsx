@@ -2,7 +2,7 @@
 
 import { ConnectKitButton } from "connectkit";
 import Link from "next/link";
-import { Repeat, Activity, Wallet, ChevronDown } from "lucide-react";
+import { Repeat, Activity, Wallet, ChevronDown, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,6 +81,16 @@ const Header = () => {
             >
               <Wallet size={20} />
               <span>Balance</span>
+            </Link>
+            <Link 
+              href="/layer2" 
+              className={cn(
+                "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
+                pathname === "/layer2" && "text-primary"
+              )}
+            >
+              <Shield size={20} />
+              <span>AVS</span>
             </Link>
           </nav>
         </div>

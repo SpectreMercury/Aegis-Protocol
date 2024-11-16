@@ -11,11 +11,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface Layer2Data {
-  id: number;
+  chainId: number;
   name: string;
   icon: string;
   stateValidation: string;
@@ -26,220 +27,158 @@ interface Layer2Data {
   proposer: string;
   tvl: number;
   tokenPrice: number;
+  metrics?: {
+    tvlChange24h: number;
+    transactions7d: number;
+    transactionsChange7d: number;
+    fees7d: number;
+  };
 }
 
-const layer2Data: Layer2Data[] = [
-  {
-    id: 1,
-    name: "Arbitrum One",
-    icon: "./img/arbitrum.webp",
-    stateValidation: "Fraud proofs (INT)",
-    challengePeriod: "6d 8h",
-    dataAvailability: "Onchain",
-    exitWindow: "7d",
-    sequencer: "Self sequence",
-    proposer: "Self propose",
-    tvl: 15200000000,
-    tokenPrice: 0.00026
-  },
-  {
-    id: 2,
-    name: "Base",
-    icon: "./img/base.webp",
-    stateValidation: "Fraud proofs (INT)",
-    challengePeriod: "3d 12h",
-    dataAvailability: "Onchain",
-    exitWindow: "None",
-    sequencer: "Self sequence",
-    proposer: "Self propose",
-    tvl: 8100000000,
-    tokenPrice: 0.00018
-  },
-  {
-    id: 3,
-    name: "OP Mainnet",
-    icon: "./img/op.webp",
-    stateValidation: "Fraud proofs (INT)",
-    challengePeriod: "3d 12h",
-    dataAvailability: "Onchain",
-    exitWindow: "None",
-    sequencer: "Self sequence",
-    proposer: "Self propose",
-    tvl: 7200000000,
-    tokenPrice: 0.00035
-  },
-  {
-    id: 4,
-    name: "Blast",
-    icon: "./img/blast.webp",
-    stateValidation: "None",
-    challengePeriod: "7d",
-    dataAvailability: "Onchain",
-    exitWindow: "None",
-    sequencer: "Self sequence",
-    proposer: "Cannot withdraw",
-    tvl: 6100000000,
-    tokenPrice: 0.00022
-  },
-  {
-    id: 5,
-    name: "Scroll",
-    icon: "./img/scroll.webp",
-    stateValidation: "ZK proofs (SN)",
-    challengePeriod: "",
-    dataAvailability: "Onchain",
-    exitWindow: "None",
-    sequencer: "No mechanism",
-    proposer: "Cannot withdraw",
-    tvl: 5200000000,
-    tokenPrice: 0.00019
-  },
-  {
-    id: 6,
-    name: "Linea",
-    icon: "./img/linea.webp",
-    stateValidation: "ZK proofs (SN)",
-    challengePeriod: "",
-    dataAvailability: "Onchain",
-    exitWindow: "None",
-    sequencer: "No mechanism",
-    proposer: "Cannot withdraw",
-    tvl: 4800000000,
-    tokenPrice: 0.00015
-  },
-  {
-    id: 7,
-    name: "ZKsync Era",
-    icon: "./img/zksync.webp",
-    stateValidation: "ZK proofs (ST, SN)",
-    challengePeriod: "",
-    dataAvailability: "Onchain (SD)",
-    exitWindow: "None",
-    sequencer: "Enqueue via L1",
-    proposer: "Cannot withdraw",
-    tvl: 4500000000,
-    tokenPrice: 0.00028
-  },
-  {
-    id: 8,
-    name: "Starknet",
-    icon: "./img/starknet.webp",
-    stateValidation: "ZK proofs (ST)",
-    challengePeriod: "",
-    dataAvailability: "Onchain (SD)",
-    exitWindow: "None",
-    sequencer: "No mechanism",
-    proposer: "Cannot withdraw",
-    tvl: 4100000000,
-    tokenPrice: 0.00032
-  },
-  {
-    id: 9,
-    name: "Mode",
-    icon: "./img/mode.webp",
-    stateValidation: "None",
-    challengePeriod: "7d",
-    dataAvailability: "Onchain",
-    exitWindow: "None",
-    sequencer: "Self sequence",
-    proposer: "Cannot withdraw",
-    tvl: 3800000000,
-    tokenPrice: 0.00012
-  },
-  {
-    id: 10,
-    name: "Fuel Ignition",
-    icon: "./img/fuel.webp",
-    stateValidation: "None",
-    challengePeriod: "7d",
-    dataAvailability: "Onchain",
-    exitWindow: "None",
-    sequencer: "Self sequence",
-    proposer: "Cannot withdraw",
-    tvl: 3500000000,
-    tokenPrice: 0.00014
-  }
-];
-
 export default function Layer2Page() {
+  const [layer2Data, setLayer2Data] = useState<Layer2Data[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showBuyDialog, setShowBuyDialog] = useState(false);
   const [showSellDialog, setShowSellDialog] = useState(false);
   const [selectedL2, setSelectedL2] = useState<Layer2Data | null>(null);
   const [amount, setAmount] = useState("");
+  const [balance] = useState("1000");
+
+  useEffect(() => {
+    const fetchL2Data = async () => {
+      try {
+        const response = await fetch('/api/l2data');
+        if (!response.ok) {
+          throw new Error('Failed to fetch L2 data');
+        }
+        const data = await response.json();
+        setLayer2Data(data);
+      } catch (error) {
+        console.error('Error fetching L2 data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchL2Data();
+  }, []);
 
   const handleBuy = (l2: Layer2Data) => {
     setSelectedL2(l2);
+    setAmount("");
     setShowBuyDialog(true);
   };
 
   const handleSell = (l2: Layer2Data) => {
     setSelectedL2(l2);
+    setAmount("");
     setShowSellDialog(true);
   };
+
+  const handleMax = () => {
+    setAmount(balance);
+  };
+
+  const formatTVL = (value: number): string => {
+    if (value === 0) return '$0';
+    
+    const billion = 1000000000;
+    const million = 1000000;
+    
+    if (value >= billion) {
+      return `$${(value / billion).toFixed(2)}B`;
+    } else if (value >= million) {
+      return `$${(value / million).toFixed(2)}M`;
+    } else {
+      return `$${value.toLocaleString(undefined, {
+        maximumFractionDigits: 2
+      })}`;
+    }
+  };
+
+  const TableSkeleton = () => (
+    <>
+      {[...Array(5)].map((_, index) => (
+        <div 
+          key={index}
+          className="grid grid-cols-10 gap-4 p-4 border-b hover:bg-neutral-50/50 items-center"
+        >
+          <div className="col-span-2 flex items-center gap-2">
+            <Skeleton circle width={24} height={24} />
+            <Skeleton width={100} />
+          </div>
+          <div><Skeleton width={80} /></div>
+          <div><Skeleton width={60} /></div>
+          <div><Skeleton width={70} /></div>
+          <div><Skeleton width={50} /></div>
+          <div><Skeleton width={80} /></div>
+          <div><Skeleton width={80} /></div>
+          <div><Skeleton width={120} /></div>
+          <div className="flex flex-col gap-2">
+            <Skeleton width="100%" height={32} />
+            <Skeleton width="100%" height={32} />
+          </div>
+        </div>
+      ))}
+    </>
+  );
 
   return (
     <div className="container mx-auto max-w-7xl py-8">
       <Card className="bg-white/50 backdrop-blur-sm">
-        <div className="grid grid-cols-8 gap-4 p-4 border-b text-xs font-medium text-muted-foreground tracking-wide uppercase">
-          <div className="col-span-2">Name</div>
-          <div>State Validation</div>
+        <div className="grid grid-cols-10 gap-4 p-4 border-b font-medium">
+          <div className="col-span-1">Chain</div>
+          <div className="col-span-2 flex items-center gap-2">State Validation</div>
+          <div>Challenge Period</div>
           <div>Data Availability</div>
           <div>Exit Window</div>
           <div>Sequencer</div>
           <div>Proposer</div>
           <div>TVL</div>
-          <div className="text-right">Actions</div>
+          <div>Actions</div>
         </div>
-
-        {layer2Data.map((l2) => (
-          <div 
-            key={l2.id} 
-            className="grid grid-cols-8 gap-4 p-4 border-b hover:bg-neutral-50/50 items-center text-sm"
-          >
-            <div className="col-span-2">
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6">
-                  <img 
-                    src={l2.icon} 
-                    alt={l2.name}
-                    className="w-full h-full object-contain rounded-full"
-                  />
-                </div>
-                <span className="font-medium">{l2.name}</span>
+        {loading ? (
+          <TableSkeleton />
+        ) : (
+          layer2Data.map((l2) => (
+            <div 
+              key={l2.chainId}
+              className="grid grid-cols-10 gap-4 p-4 border-b hover:bg-neutral-50/50 items-center text-sm"
+            >
+              <div className="col-span-1 flex items-center gap-2">
+                <img src={l2.icon} alt={l2.name} className="w-6 h-6" />
+                <span>{l2.name}</span>
+              </div>
+              <div className="col-span-2 flex items-center gap-2">{l2.stateValidation}</div>
+              <div>{l2.challengePeriod}</div>
+              <div>{l2.dataAvailability}</div>
+              <div>{l2.exitWindow}</div>
+              <div>{l2.sequencer}</div>
+              <div>{l2.proposer}</div>
+              <div className="font-mono">
+                {formatTVL(l2.tvl)}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => handleBuy(l2)}
+                >
+                  Buy
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => handleSell(l2)}
+                >
+                  Sell
+                </Button>
               </div>
             </div>
-            <div className="text-neutral-600">{l2.stateValidation}</div>
-            <div className="text-neutral-600">{l2.dataAvailability}</div>
-            <div className={cn(
-              "text-neutral-600",
-              l2.exitWindow === "None" && "text-red-500"
-            )}>{l2.exitWindow}</div>
-            <div className="text-neutral-600">{l2.sequencer}</div>
-            <div className={cn(
-              "text-neutral-600",
-              l2.proposer === "Cannot withdraw" && "text-red-500"
-            )}>{l2.proposer}</div>
-            <div className="font-mono">{l2.tvl} ETH</div>
-            <div className="flex gap-2 justify-end">
-              <Button 
-                size="sm"
-                variant="outline" 
-                className="rounded-full text-xs px-4"
-                onClick={() => handleBuy(l2)}
-              >
-                Buy
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="rounded-full text-xs px-4"
-                onClick={() => handleSell(l2)}
-              >
-                Sell
-              </Button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </Card>
 
       <Dialog open={showBuyDialog} onOpenChange={setShowBuyDialog}>
@@ -278,13 +217,28 @@ export default function Layer2Page() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Amount ({selectedL2?.name})</label>
-              <Input
-                type="number"
-                placeholder="0.0"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium">Amount ({selectedL2?.name})</label>
+                <div className="text-sm text-muted-foreground">
+                  Balance: {balance} {selectedL2?.name}
+                </div>
+              </div>
+              <div className="relative">
+                <Input
+                  type="number"
+                  placeholder="0.0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-6 text-xs"
+                  onClick={handleMax}
+                >
+                  MAX
+                </Button>
+              </div>
             </div>
             <div className="text-sm text-muted-foreground">
               You will receive: {amount ? (parseFloat(amount) * (selectedL2?.tokenPrice || 0)).toFixed(6) : '0'} ETH
