@@ -9,7 +9,6 @@ module.exports = {
   solidity: "0.8.27",
   networks: {
     hardhat: {
-      chainId: 31337
     },
     sepolia: {
       url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,

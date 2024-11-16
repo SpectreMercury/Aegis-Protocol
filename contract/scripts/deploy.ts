@@ -1,12 +1,11 @@
-const hre = require("hardhat");
+import { ethers } from "hardhat";
 
 async function main() {
   // Deploy the Aegis contract
-  const Aegis = await hre.ethers.getContractFactory("Aegis");
+  const Aegis = await ethers.getContractFactory("Aegis");
   const aegis = await Aegis.deploy();
-  await aegis.deployed();
-
-  console.log("Aegis deployed to:", aegis.address);
+  await aegis.waitForDeployment(); 
+  console.log("Aegis deployed to:", await aegis.getAddress());
 
   // Create a new key named "RugChain"
   const createTx = await aegis.create("RugChain");
