@@ -34,10 +34,13 @@ contract Aegis is ERC1155, ISPHook {
         bool isLiquidated;
         bytes32 merkleRoot;
     }
-
+    mapping(uint256 => Key) public keys;
     address public owner;
     uint256 public keyIndex;
-    mapping(uint256 => Key) public keys;
+    // L1 SLOAD address
+    address constant L1_SLOAD_ADDRESS = 0x0000000000000000000000000000000000000101;
+    // address constant L1_DEFI_ADDRESS = 0xD03Dc9381653A1647f38B93047B5291046Cb2286;
+
     mapping(address => uint256[]) public userKeys;
     mapping(uint256 => uint256) public totalSupply;
     mapping(uint256 => uint256) public pool;
@@ -128,6 +131,17 @@ contract Aegis is ERC1155, ISPHook {
         pool[keyId] += price;
         _mint(msg.sender, keyId, amount, "");
         emit Trade(TradeType.Buy, keyId, msg.sender, amount, price);
+    }
+
+    function readSingleSlot(address l1_contract, uint256 slot) public view returns (bytes memory) {
+        bytes memory input = abi.encodePacked(l1_contract, slot);
+        bool success;
+        bytes memory result;
+        (success, result) = L1_SLOAD_ADDRESS.staticcall(input);
+        if (!success) {
+            revert("L1SLOAD failed");
+        }
+        return result;
     }
 
     function sell(uint256 keyId, uint256 amount) public {

@@ -13,6 +13,12 @@ module.exports = {
     sepolia: {
       url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
       accounts: [PRIVATE_KEY]
+    },
+    scrollDevnet: {
+      url: "https://l1sload-rpc.scroll.io",
+      accounts: [PRIVATE_KEY],
+      chainId: 2227728
+      // https://l1sload-blockscout.scroll.io
     }
   }
 };

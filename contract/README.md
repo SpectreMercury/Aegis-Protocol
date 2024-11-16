@@ -14,11 +14,11 @@ npx hardhat run scripts/deploy.js --network localhost
 npx hardhat run scripts/deploy.ts --network sepolia
 npx hardhat run scripts/update.ts --network sepolia
 
+npx hardhat run scripts/deploy.ts --network scrollDevnet
+npx hardhat run scripts/scroll.ts --network scrollDevnet
 ```
 
 Deployed testnet contract: 
 
 Sepolia: 0xC52e4027129AFBBEb672512107EA2E2B251F7EDd
-
-
-
+Scroll Devnet: 0x6C566F193656f69a54A7dabCc832CF0001E880dB

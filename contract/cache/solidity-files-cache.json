@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/henryuan/Desktop/Aegis-Protocol/contract/contracts/Aegis.sol": {
-      "lastModificationDate": 1731763956732,
-      "contentHash": "becf3da4821571cea0d7f7990b480708",
+      "lastModificationDate": 1731767922978,
+      "contentHash": "e1c9ed600b7da33a9f24d4f6e1bcb5c3",
       "sourceName": "contracts/Aegis.sol",
       "solcConfig": {
         "version": "0.8.27",

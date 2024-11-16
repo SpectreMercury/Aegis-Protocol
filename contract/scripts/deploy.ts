@@ -8,7 +8,7 @@ async function main() {
   // Create a new key named "RugChain"
   const createTx = await aegis.create("RugChain");
   await createTx.wait();
-  // console.log("Created RugChain key with ID: 0");
+  console.log("Created RugChain key with ID: 0");
   console.log("Aegis deployed to:", await aegis.getAddress());
 }
 
