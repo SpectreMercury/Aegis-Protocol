@@ -107,7 +107,7 @@ contract Aegis is ERC1155, ISPHook {
 
     // Simplified curve function - linear pricing
     function _curve(uint256 x) private pure returns (uint256) {
-        return x <= CREATOR_PREMINT ? 0 : (x - CREATOR_PREMINT) * 0.001 ether;
+        return x <= CREATOR_PREMINT ? 0 : ((x - CREATOR_PREMINT) * (x - CREATOR_PREMINT) * (x - CREATOR_PREMINT));
     }
 
     function getPrice(uint256 supply, uint256 amount) public pure returns (uint256) {
