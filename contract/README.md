@@ -25,6 +25,6 @@ Deployed testnet contract:
 - Scroll Devnet: 0x25B6F252eCed1a26A9192EC35C6a83d1fa355843
 - Fhenix: 0x6C566F193656f69a54A7dabCc832CF0001E880dB
 
-#interactWithAegis.ts  
+# interactWithAegis.ts  
 run ts-node scripts/interactWithAegis.ts  
 
