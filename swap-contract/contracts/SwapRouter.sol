@@ -10,7 +10,7 @@ contract SwapRouter is ReentrancyGuard {
     
     event PoolCreated(address token0, address token1, address pool);
     
-    function createPool(address tokenA, address tokenB) external returns (address pool) {
+    function createPool(address tokenA, address tokenB, uint256 amount0, uint256 amount1) external returns (address pool) {
         require(tokenA != tokenB, "IDENTICAL_ADDRESSES");
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
         require(pools[token0][token1] == address(0), "POOL_EXISTS");
@@ -18,6 +18,14 @@ contract SwapRouter is ReentrancyGuard {
         pool = address(new SwapPool(token0, token1));
         pools[token0][token1] = pool;
         pools[token1][token0] = pool;
+        
+        IERC20(token0).transferFrom(msg.sender, address(this), amount0);
+        IERC20(token1).transferFrom(msg.sender, address(this), amount1);
+        
+        IERC20(token0).approve(pool, amount0);
+        IERC20(token1).approve(pool, amount1);
+        
+        SwapPool(pool).addLiquidity(amount0, amount1);
         
         emit PoolCreated(token0, token1, pool);
     }

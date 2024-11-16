@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
+import { useSystemStore } from '@/lib/store';
 
 export default function StatusPage() {
   const [nextSync] = useState<number>(47);
@@ -26,7 +27,9 @@ export default function StatusPage() {
   const [showStopDialog, setShowStopDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentBlock, setCurrentBlock] = useState(47);
+  const setEmergencyMode = useSystemStore((state) => state.setEmergencyMode);
 
   useEffect(() => {
     const initData = async () => {
@@ -114,6 +117,7 @@ export default function StatusPage() {
   const handleFinalConfirm = () => {
     setShowConfirmDialog(false);
     setIsStopped(true);
+    setEmergencyMode(true);
     
     // Update block progress heatmap
     const newBlockProgress = Array(100).fill(0);
