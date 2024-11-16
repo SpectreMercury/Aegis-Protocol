@@ -30,9 +30,11 @@
     "react": "^18",
     "react-dom": "^18",
     "react-loading-skeleton": "^3.5.0",
+    "safe-buffer": "^5.2.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "wagmi": "^2.12.32"
+    "viem": "^2.21.45",
+    "wagmi": "^2.12.33"
   },
   "devDependencies": {
     "@types/node": "^20",

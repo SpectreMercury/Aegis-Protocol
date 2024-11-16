@@ -95,8 +95,40 @@ const Header = () => {
           </nav>
         </div>
 
-        {/* 右侧钱包连接按钮 */}
-        <div>
+        {/* 右侧部分添加网络选择器 */}
+        <div className="flex items-center gap-4">
+          {/* 网络切换下拉菜单 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary outline-none">
+              <span className="flex items-center gap-2">
+                <Activity size={20} />
+                <span>选择网络</span>
+                <ChevronDown size={16} />
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuItem className="cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <Activity size={16} />
+                  <span>Aegis power by scroll</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <Activity size={16} />
+                  <span>Aegis power by arbitrum</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <div className="flex items-center gap-2">
+                  <Activity size={16} />
+                  <span>Aegis power by op</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* 原有的钱包连接按钮 */}
           <ConnectKitButton />
         </div>
       </div>
