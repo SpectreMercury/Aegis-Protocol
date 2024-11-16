@@ -19,7 +19,6 @@ export default function SwapPage() {
   const [inputToken, setInputToken] = useState({ symbol: "ETH", icon: TokenETH });
   const [outputToken, setOutputToken] = useState({ symbol: "USDC", icon: TokenUSDC });
 
-  // 模拟的代币列表
   const tokenList = [
     { symbol: "ETH", name: "Ethereum", icon: TokenETH, balance: "0.0" },
     { symbol: "USDC", name: "USD Coin", icon: TokenUSDC, balance: "0.0" },
@@ -27,7 +26,6 @@ export default function SwapPage() {
     { symbol: "DAI", name: "Dai", icon: TokenDAI, balance: "0.0" },
   ];
 
-  // 切换代币位置
   const handleSwapTokens = () => {
     const tempToken = inputToken;
     setInputToken(outputToken);
@@ -38,7 +36,6 @@ export default function SwapPage() {
     setOutputAmount(tempAmount);
   };
 
-  // 选择代币
   const handleTokenSelect = (token: typeof tokenList[0]) => {
     if (activeField === "input") {
       setInputToken({ symbol: token.symbol, icon: token.icon });
@@ -62,15 +59,14 @@ export default function SwapPage() {
     <>
       <div className="flex min-h-[calc(100vh-64px)] items-center justify-center p-4">
         <Card className="w-full max-w-[480px] p-4">
-          {/* 头部 */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">兑换</h2>
+            <h2 className="text-xl font-semibold">Swap</h2>
             <Button variant="ghost" size="icon">
               <Settings className="h-5 w-5" />
             </Button>
           </div>
 
-          {/* 代币输入 */}
+   
           <div className="rounded-2xl bg-muted p-4 mb-1">
             <div className="flex justify-between mb-2">
               <Input
@@ -94,7 +90,7 @@ export default function SwapPage() {
               </Button>
             </div>
             <div className="text-sm text-muted-foreground">
-              余额: 0.0 {inputToken.symbol}
+              Balance: 0.0 {inputToken.symbol}
             </div>
           </div>
 
@@ -134,15 +130,14 @@ export default function SwapPage() {
               </Button>
             </div>
             <div className="text-sm text-muted-foreground">
-              余额: 0.0 {outputToken.symbol}
+              Balance: 0.0 {outputToken.symbol}
             </div>
           </div>
 
-          {/* 兑换率信息 */}
           <div className="mt-4 p-3 rounded-lg bg-muted">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">兑换率</span>
-              <span>1 {inputToken.symbol} = 1,800 {outputToken.symbol}</span>
+              <span className="text-muted-foreground">Rate</span>
+              <span>1 {inputToken.symbol} = 3,800 {outputToken.symbol}</span>
             </div>
           </div>
 
@@ -153,7 +148,7 @@ export default function SwapPage() {
               size="lg"
               onClick={() => handleSwapTokens()}
             >
-              兑换
+              Swap
             </Button>
           ) : (
             <ConnectKitButton.Custom>
@@ -163,7 +158,7 @@ export default function SwapPage() {
                   size="lg"
                   onClick={show}
                 >
-                  连接钱包
+                  Connect Wallet
                 </Button>
               )}
             </ConnectKitButton.Custom>
