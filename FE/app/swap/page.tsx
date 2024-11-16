@@ -265,7 +265,7 @@ export default function SwapPage() {
       <Dialog open={showTokenList} onOpenChange={setShowTokenList}>
         <DialogContent className="max-w-[400px] p-0">
           <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">选择代币</h2>
+            <h2 className="text-xl font-semibold mb-4">Choose Token</h2>
             <div className="relative mb-4">
               <Input 
                 placeholder="搜索代币名称" 

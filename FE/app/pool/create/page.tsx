@@ -8,9 +8,9 @@ import { ArrowLeft, Settings, ChevronDown, ArrowDown, Search } from "lucide-reac
 import Link from "next/link";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { commonTokens } from "@/lib/tokens";
-import { useAccount, useReadContracts, useWriteContract } from "wagmi";
-import { SWAP_ROUTER_ADDRESS, SWAP_ROUTER_ABI } from "@/lib/contracts";
-import { formatUnits, parseAbi, parseUnits } from "viem";
+import { useAccount, useReadContracts } from "wagmi";
+// import { SWAP_ROUTER_ADDRESS, SWAP_ROUTER_ABI } from "@/lib/contracts";
+import { formatUnits, parseAbi } from "viem";
 import { ConnectKitButton } from "connectkit";
 
 export default function CreatePoolPage() {
@@ -58,9 +58,9 @@ export default function CreatePoolPage() {
   const formattedToken1Balance = tokenBalances[token1.symbol] || '0.0';
 
   // 合约交互相关代码保持不变
-  const { writeContract: approveToken0 } = useWriteContract();
-  const { writeContract: approveToken1 } = useWriteContract();
-  const { writeContract: createPool } = useWriteContract();
+  // const { writeContract: approveToken0 } = useWriteContract();
+  // const { writeContract: approveToken1 } = useWriteContract();
+  // const { writeContract: createPool } = useWriteContract();
 
   const handleTokenSelect = (token: typeof commonTokens[0]) => {
     if (activeField === "token0") {
@@ -76,33 +76,33 @@ export default function CreatePoolPage() {
 
     try {
       // 1. Approve token0
-      const tx1 = await approveToken0({
-        address: token0.address as `0x${string}`,
-        abi: parseAbi(['function approve(address spender, uint256 amount) returns (bool)']),
-        functionName: 'approve',
-        args: [SWAP_ROUTER_ADDRESS, parseUnits(amount0, token0.decimals)],
-      });
+      // const tx1 = await approveToken0({
+      //   address: token0.address as `0x${string}`,
+      //   abi: parseAbi(['function approve(address spender, uint256 amount) returns (bool)']),
+      //   functionName: 'approve',
+      //   args: [SWAP_ROUTER_ADDRESS, parseUnits(amount0, token0.decimals)],
+      // });
 
-      // 2. Approve token1
-      const tx2 = await approveToken1({
-        address: token1.address as `0x${string}`,
-        abi: parseAbi(['function approve(address spender, uint256 amount) returns (bool)']),
-        functionName: 'approve',
-        args: [SWAP_ROUTER_ADDRESS, parseUnits(amount1, token1.decimals)],
-      });
+      // // 2. Approve token1
+      // const tx2 = await approveToken1({
+      //   address: token1.address as `0x${string}`,
+      //   abi: parseAbi(['function approve(address spender, uint256 amount) returns (bool)']),
+      //   functionName: 'approve',
+      //   args: [SWAP_ROUTER_ADDRESS, parseUnits(amount1, token1.decimals)],
+      // });
 
-      // 3. Create pool
-      const tx3 = await createPool({
-        address: SWAP_ROUTER_ADDRESS,
-        abi: parseAbi(SWAP_ROUTER_ABI),
-        functionName: 'createPool',
-        args: [
-          token0.address,
-          token1.address,
-          parseUnits(amount0, token0.decimals),
-          parseUnits(amount1, token1.decimals)
-        ],
-      });
+      // // 3. Create pool
+      // const tx3 = await createPool({
+      //   address: SWAP_ROUTER_ADDRESS,
+      //   abi: parseAbi(SWAP_ROUTER_ABI),
+      //   functionName: 'createPool',
+      //   args: [
+      //     token0.address,
+      //     token1.address,
+      //     parseUnits(amount0, token0.decimals),
+      //     parseUnits(amount1, token1.decimals)
+      //   ],
+      // });
 
     } catch (error) {
       console.error('创建池子失败:', error);
@@ -127,7 +127,7 @@ export default function CreatePoolPage() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <h2 className="text-xl font-semibold">创建新池子</h2>
+            <h2 className="text-xl font-semibold">Create New Pool</h2>
           </div>
           <Button variant="ghost" size="icon">
             <Settings className="h-5 w-5" />
@@ -158,14 +158,14 @@ export default function CreatePoolPage() {
               </Button>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>余额: {formattedToken0Balance}</span>
+              <span>Balance: {formattedToken0Balance}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="h-auto p-0"
                 onClick={() => handleMaxAmount("token0")}
               >
-                最大
+                Max
               </Button>
             </div>
           </div>
@@ -199,44 +199,42 @@ export default function CreatePoolPage() {
               </Button>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>余额: {formattedToken1Balance}</span>
+              <span>Balance: {formattedToken1Balance}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="h-auto p-0"
                 onClick={() => handleMaxAmount("token1")}
               >
-                最大
+                MAX
               </Button>
             </div>
           </div>
         </div>
 
-        {/* 创建池子按钮 */}
         {isConnected ? (
           <Button 
             className="w-full mt-4" 
             onClick={handleCreatePool}
             disabled={!amount0 || !amount1}
           >
-            创建池子
+            Create Pool
           </Button>
         ) : (
           <ConnectKitButton.Custom>
             {({ show }) => (
               <Button className="w-full mt-4" onClick={show}>
-                连接钱包
+                Connect Wallet
               </Button>
             )}
           </ConnectKitButton.Custom>
         )}
       </Card>
 
-      {/* 代币列表弹窗 */}
       <Dialog open={showTokenList} onOpenChange={setShowTokenList}>
         <DialogContent className="max-w-[400px] p-0">
           <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">选择代币</h2>
+            <h2 className="text-xl font-semibold mb-4">Choose Token</h2>
             <div className="relative mb-4">
               <Input 
                 placeholder="搜索代币名称" 

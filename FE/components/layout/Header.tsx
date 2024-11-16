@@ -90,7 +90,7 @@ const Header = () => {
               )}
             >
               <Shield size={20} />
-              <span>AVS</span>
+              <span>Insurance Pool</span>
             </Link>
           </nav>
         </div>
@@ -102,7 +102,7 @@ const Header = () => {
             <DropdownMenuTrigger className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary outline-none">
               <span className="flex items-center gap-2">
                 <Activity size={20} />
-                <span>选择网络</span>
+                <span>Select Network</span>
                 <ChevronDown size={16} />
               </span>
             </DropdownMenuTrigger>

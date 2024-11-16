@@ -10,46 +10,39 @@ const config: Config = {
   theme: {
   	extend: {
   		colors: {
-  			background: 'hsl(var(--background))',
-  			foreground: 'hsl(var(--foreground))',
-  			card: {
-  				DEFAULT: 'hsl(var(--card))',
-  				foreground: 'hsl(var(--card-foreground))'
-  			},
-  			popover: {
-  				DEFAULT: 'hsl(var(--popover))',
-  				foreground: 'hsl(var(--popover-foreground))'
-  			},
+  			border: "hsl(20 5.9% 90%)",
+  			input: "hsl(20 5.9% 90%)",
+  			ring: "hsl(24 97% 54%)",
+  			background: "hsl(0 0% 100%)",
+  			foreground: "hsl(20 6% 10%)",
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
+  				DEFAULT: "hsl(24 97% 54%)",
+  				foreground: "hsl(0 0% 100%)",
   			},
   			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
-  				foreground: 'hsl(var(--secondary-foreground))'
-  			},
-  			muted: {
-  				DEFAULT: 'hsl(var(--muted))',
-  				foreground: 'hsl(var(--muted-foreground))'
-  			},
-  			accent: {
-  				DEFAULT: 'hsl(var(--accent))',
-  				foreground: 'hsl(var(--accent-foreground))'
+  				DEFAULT: "hsl(20 5.9% 90%)",
+  				foreground: "hsl(24 10% 10%)",
   			},
   			destructive: {
-  				DEFAULT: 'hsl(var(--destructive))',
-  				foreground: 'hsl(var(--destructive-foreground))'
+  				DEFAULT: "hsl(0 84.2% 60.2%)",
+  				foreground: "hsl(0 0% 98%)",
   			},
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			}
+  			muted: {
+  				DEFAULT: "hsl(20 5.9% 96%)",
+  				foreground: "hsl(20 5.9% 40%)",
+  			},
+  			accent: {
+  				DEFAULT: "hsl(20 5.9% 96%)",
+  				foreground: "hsl(24 10% 10%)",
+  			},
+  			popover: {
+  				DEFAULT: "hsl(0 0% 100%)",
+  				foreground: "hsl(20 6% 10%)",
+  			},
+  			card: {
+  				DEFAULT: "hsl(0 0% 100%)",
+  				foreground: "hsl(20 6% 10%)",
+  			},
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
