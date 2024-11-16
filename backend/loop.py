@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from typing import Dict, List
 from eth_utils import keccak
+import traceback
 
 def generate_merkle_root(balances: Dict[str, int]) -> bytes:
     """
@@ -111,6 +112,7 @@ def update_merkle(contract, key_id: int, balances: Dict[str, int]):
         balances: Dictionary mapping addresses to their balance in wei
     """
     try:
+        w3 = Web3(Web3.HTTPProvider(os.getenv('PROVIDER_URL')))
         # Generate merkle root from balances
         merkle_root = generate_merkle_root(balances)
         # Build transaction
@@ -138,6 +140,7 @@ def update_merkle(contract, key_id: int, balances: Dict[str, int]):
         
     except Exception as e:
         print(f"Error updating merkle root: {str(e)}")
+        traceback.print_exc()
         return None
 
 if __name__ == "__main__":

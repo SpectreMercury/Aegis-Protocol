@@ -39,7 +39,7 @@ contract Aegis is ERC1155, ISPHook {
     uint256 public keyIndex;
     // L1 SLOAD address
     address constant L1_SLOAD_ADDRESS = 0x0000000000000000000000000000000000000101;
-    // address constant L1_DEFI_ADDRESS = 0xD03Dc9381653A1647f38B93047B5291046Cb2286;
+    address constant L1_DEFI_ADDRESS = 0xC52e4027129AFBBEb672512107EA2E2B251F7EDd;
 
     mapping(address => uint256[]) public userKeys;
     mapping(uint256 => uint256) public totalSupply;
@@ -142,6 +142,25 @@ contract Aegis is ERC1155, ISPHook {
             revert("L1SLOAD failed");
         }
         return result;
+    }
+
+    function readL1ContractOwner(address l1_contract) public view returns (address) {
+        // Owner is typically stored in slot 3 based on the provided context
+        bytes memory result = readSingleSlot(l1_contract, 2);
+        return address(uint160(uint256(bytes32(result))));
+    }
+
+    // Only owner can create new insurance keys
+    function createFromL1(string calldata name) public {
+        require(msg.sender == readL1ContractOwner(L1_DEFI_ADDRESS), "Not L1 DEFI owner");
+        uint256 newKeyId = keyIndex;
+        keys[newKeyId] = Key(newKeyId, name, msg.sender, false, bytes32(0));
+        userKeys[msg.sender].push(newKeyId);
+        totalSupply[newKeyId] += CREATOR_PREMINT;
+        keyIndex = newKeyId + 1;
+        _mint(msg.sender, newKeyId, CREATOR_PREMINT, "");
+        emit Create(newKeyId, msg.sender, name);
+        emit Trade(TradeType.Mint, newKeyId, msg.sender, CREATOR_PREMINT, 0);
     }
 
     function sell(uint256 keyId, uint256 amount) public {
