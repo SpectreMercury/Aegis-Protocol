@@ -4,16 +4,96 @@ import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { Heatmap } from "@/components/ui/heatmap";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function StatusPage() {
   const [nextSync] = useState<number>(47);
   const [blockProgress, setBlockProgress] = useState<number[]>([]);
   const [systemUptime, setSystemUptime] = useState<number[]>([]);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setBlockProgress(Array(100).fill(0));
-    setSystemUptime(Array(90).fill(100));
+    const initData = async () => {
+      // 模拟数据加载
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setBlockProgress(Array(100).fill(0));
+      setSystemUptime(Array(90).fill(100));
+      setLoading(false);
+      
+      // 触发动画
+      setTimeout(() => {
+        setShowAnimation(true);
+      }, 100);
+    };
+
+    initData();
   }, []);
+
+  // 骨架屏组件
+  const StatusSkeleton = () => (
+    <Card className="p-6 mb-8 bg-gradient-to-r from-green-50 to-blue-50">
+      <div className="space-y-8">
+        {/* 同步倒计时骨架屏 */}
+        <div>
+          <Skeleton className="h-5 w-32 mb-2 bg-neutral-200/70" />
+          <Skeleton className="h-8 w-48 bg-neutral-200/70" />
+        </div>
+
+        {/* 同步进度骨架屏 */}
+        <div>
+          <div className="flex justify-between mb-3">
+            <Skeleton className="h-4 w-24 bg-neutral-200/70" />
+            <Skeleton className="h-4 w-20 bg-neutral-200/70" />
+          </div>
+          <div className="grid grid-cols-20 gap-1">
+            {Array(100).fill(0).map((_, i) => (
+              <Skeleton 
+                key={i} 
+                className="aspect-square w-full bg-neutral-200/70"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* 系统稳定性骨架屏 */}
+        <div>
+          <div className="flex justify-between mb-3">
+            <Skeleton className="h-4 w-32 bg-neutral-200/70" />
+            <Skeleton className="h-4 w-20 bg-neutral-200/70" />
+          </div>
+          <div className="grid grid-cols-15 gap-1">
+            {Array(90).fill(0).map((_, i) => (
+              <Skeleton 
+                key={i} 
+                className="aspect-square w-full bg-neutral-200/70"
+              />
+            ))}
+          </div>
+          <div className="flex justify-end items-center gap-2 mt-2">
+            <Skeleton className="h-3 w-8 bg-neutral-200/70" />
+            <div className="flex gap-1">
+              {Array(5).fill(0).map((_, i) => (
+                <Skeleton 
+                  key={i} 
+                  className="w-3 h-3 bg-neutral-200/70" 
+                />
+              ))}
+            </div>
+            <Skeleton className="h-3 w-8 bg-neutral-200/70" />
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+
+  if (loading) {
+    return (
+      <div className="container mx-auto max-w-3xl py-8">
+        <StatusSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -40,6 +120,7 @@ export default function StatusPage() {
               type="progress"
               currentProgress={53}
               className="w-full"
+              animate={showAnimation}
             />
           </div>
 
