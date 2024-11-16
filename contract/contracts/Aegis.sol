@@ -4,7 +4,16 @@ pragma solidity ^0.8.27;
 import "./ERC1155.sol";
 error Unauthorized();
 
-contract Aegis is ERC1155 {
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { IERC20 } from "@openzeppelin/contracts/interfaces/IERC20.sol";
+import { ISP } from "@ethsign/sign-protocol-evm/src/interfaces/ISP.sol";
+import { ISPHook } from "@ethsign/sign-protocol-evm/src/interfaces/ISPHook.sol";
+import { Attestation } from "@ethsign/sign-protocol-evm/src/models/Attestation.sol";
+import { DataLocation } from "@ethsign/sign-protocol-evm/src/models/DataLocation.sol";
+
+contract Aegis is ERC1155, ISPHook {
+    error UnsupportedOperation();
+    event AttestationVerified(address indexed issuer, uint256 blockNumber, uint256 indexed keyId, bytes32 merkleRoot);
     event Create(uint256 indexed keyId, address indexed sender, string name);
     event Liquidate(uint256 indexed keyId, address indexed sender, bool status);
     event Trade(
@@ -35,6 +44,8 @@ contract Aegis is ERC1155 {
     uint256 public constant CREATOR_PREMINT = 1 ether; // 1e18
     uint256 public constant CLAIM_PERCENT = 999; // 99.9%
     uint256 public constant CLAIM_DENOMINATOR = 1000;
+    ISP public spInstance;
+    uint64 public schemaId;
 
     enum TradeType {
         Mint,
@@ -49,6 +60,14 @@ contract Aegis is ERC1155 {
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
         _;
+    }
+
+    function setSPInstance(address instance) external {
+        spInstance = ISP(instance);
+    }
+
+    function setSchemaID(uint64 schemaId_) external {
+        schemaId = schemaId_;
     }
 
     // Only owner can create new insurance keys
@@ -121,6 +140,7 @@ contract Aegis is ERC1155 {
     function updateMerkleRoot(uint256 keyId, bytes32 merkleRoot) public {
         require(keyId < keyIndex, "Key does not exist");
         keys[keyId].merkleRoot = merkleRoot;
+        this._attest(merkleRoot, msg.sender, block.number, keyId);
         emit MerkleRootUpdated(keyId, merkleRoot);
     }
 
@@ -176,4 +196,88 @@ contract Aegis is ERC1155 {
     function uri(uint256 id) public view override returns (string memory) {
         return keys[id].name;
     }
+
+    function _checkAttestation(bytes32 merkleRoot, address issuer, uint256 blockNumber, uint256 keyId) internal view {
+        // solhint-disable-next-line custom-errors
+        require(blockNumber <= block.number, "Block number cannot be in the future");
+        require(merkleRoot != keys[keyId].merkleRoot, "Invalid merkle root");
+        require(issuer != keys[keyId].creator, "Invalid issuer");
+    }
+
+    // Sign Protocol Schema Hook
+    function didReceiveAttestation(
+        address attester, // attester
+        uint64, // schemaId
+        uint64 attestationId,
+        bytes calldata // extraData
+    )
+        external
+        payable
+    {
+        // if (attester != address(this)) {
+        //     revert Unauthorized();
+        // }
+        Attestation memory attestation = ISP(msg.sender).getAttestation(attestationId);
+        (bytes32 merkleRoot, address account, uint256 blockNumber, uint256 keyId) = abi.decode(attestation.data, (bytes32, address, uint256, uint256));
+        _checkAttestation(merkleRoot, account, blockNumber, keyId);
+    }
+
+    function didReceiveAttestation(
+        address, // attester
+        uint64, // schemaId
+        uint64, // attestationId
+        IERC20, // resolverFeeERC20Token
+        uint256, // resolverFeeERC20Amount
+        bytes calldata // extraData
+    )
+        external
+        pure
+    {
+        revert UnsupportedOperation();
+    }
+
+    function didReceiveRevocation(
+        address, // attester
+        uint64, // schemaId
+        uint64, // attestationId
+        bytes calldata // extraData
+    )
+        external
+        payable
+    {
+        revert UnsupportedOperation();
+    }
+
+    function didReceiveRevocation(
+        address, // attester
+        uint64, // schemaId
+        uint64, // attestationId
+        IERC20, // resolverFeeERC20Token
+        uint256, // resolverFeeERC20Amount
+        bytes calldata // extraData
+    )
+        external
+        pure
+    {
+        revert UnsupportedOperation();
+    }
+
+    function _attest(bytes32 merkleRoot, address account, uint256 blockNumber, uint256 keyId) external returns (uint64) {
+        bytes[] memory recipients = new bytes[](1);
+        recipients[0] = abi.encode(address(this));
+        Attestation memory a = Attestation({
+            schemaId: schemaId,
+            linkedAttestationId: 0,
+            attestTimestamp: 0,
+            revokeTimestamp: 0,
+            attester: address(this),
+            validUntil: 0,
+            dataLocation: DataLocation.ONCHAIN,
+            revoked: false,
+            recipients: recipients,
+            data: abi.encode(merkleRoot, account, blockNumber, keyId)
+        });
+        return spInstance.attest(a, "", "", "");
+    }
+    // Sign Protocol End
 }
