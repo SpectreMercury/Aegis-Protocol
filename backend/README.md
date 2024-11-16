@@ -23,3 +23,6 @@ Server: Werkzeug/2.0.3 Python/3.10.10
 Date: Sat, 16 Nov 2024 15:58:02 GMT
 
 {"attestations":"https://testnet-scan.sign.global/attestation/onchain_evm_11155111_0x3f9","block":7089751,"merkleRoot":"bf302ca9d841375d2aa3a50ca590b080b72639c6a672603d5fe78d2876fa9f1b","txnId":"0xdf405263399ac3666af2627b0ef0f5757c8105c3243dfd47e2fd63a6cf714dda"}
+
+List API:
+http://13.212.32.248:5000/get_history/
