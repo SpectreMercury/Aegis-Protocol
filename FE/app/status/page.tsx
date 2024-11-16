@@ -5,6 +5,17 @@ import { useState, useEffect } from "react";
 import { Heatmap } from "@/components/ui/heatmap";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 
 export default function StatusPage() {
   const [nextSync] = useState<number>(47);
@@ -12,16 +23,20 @@ export default function StatusPage() {
   const [systemUptime, setSystemUptime] = useState<number[]>([]);
   const [showAnimation, setShowAnimation] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showStopDialog, setShowStopDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isStopped, setIsStopped] = useState(false);
+  const [currentBlock, setCurrentBlock] = useState(47);
 
   useEffect(() => {
     const initData = async () => {
-      // 模拟数据加载
+      // Simulate data loading
       await new Promise(resolve => setTimeout(resolve, 1000));
       setBlockProgress(Array(100).fill(0));
       setSystemUptime(Array(90).fill(100));
       setLoading(false);
       
-      // 触发动画
+      // Trigger animation
       setTimeout(() => {
         setShowAnimation(true);
       }, 100);
@@ -30,17 +45,17 @@ export default function StatusPage() {
     initData();
   }, []);
 
-  // 骨架屏组件
+  // Skeleton component
   const StatusSkeleton = () => (
     <Card className="p-6 mb-8 bg-gradient-to-r from-green-50 to-blue-50">
       <div className="space-y-8">
-        {/* 同步倒计时骨架屏 */}
+        {/* Sync countdown skeleton */}
         <div>
           <Skeleton className="h-5 w-32 mb-2 bg-neutral-200/70" />
           <Skeleton className="h-8 w-48 bg-neutral-200/70" />
         </div>
 
-        {/* 同步进度骨架屏 */}
+        {/* Sync progress skeleton */}
         <div>
           <div className="flex justify-between mb-3">
             <Skeleton className="h-4 w-24 bg-neutral-200/70" />
@@ -56,7 +71,7 @@ export default function StatusPage() {
           </div>
         </div>
 
-        {/* 系统稳定性骨架屏 */}
+        {/* System stability skeleton */}
         <div>
           <div className="flex justify-between mb-3">
             <Skeleton className="h-4 w-32 bg-neutral-200/70" />
@@ -87,6 +102,33 @@ export default function StatusPage() {
     </Card>
   );
 
+  const handleStop = () => {
+    setShowStopDialog(true);
+  };
+
+  const handleStopConfirm = () => {
+    setShowStopDialog(false);
+    setShowConfirmDialog(true);
+  };
+
+  const handleFinalConfirm = () => {
+    setShowConfirmDialog(false);
+    setIsStopped(true);
+    
+    // Update block progress heatmap
+    const newBlockProgress = Array(100).fill(0);
+    for (let i = 0; i < currentBlock - 1; i++) {
+      newBlockProgress[i] = 100; // Green for completed blocks
+    }
+    newBlockProgress[currentBlock - 1] = -100; // Red for error state
+    setBlockProgress(newBlockProgress);
+    
+    // Update system uptime heatmap
+    const newSystemUptime = [...systemUptime];
+    newSystemUptime[newSystemUptime.length - 1] = -100; // Red for latest status
+    setSystemUptime(newSystemUptime);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto max-w-3xl py-8">
@@ -99,36 +141,51 @@ export default function StatusPage() {
     <div className="container mx-auto max-w-3xl py-8">
       <Card className="p-6 mb-8 bg-gradient-to-r from-green-50 to-blue-50">
         <div className="space-y-8">
-          {/* 下一次同步倒计时 */}
-          <div>
-            <h3 className="text-base font-medium mb-1">距离下一次同步</h3>
-            <div className="text-2xl text-green-600 font-medium">
-              还需 {nextSync} 个区块
+          {/* Next sync countdown */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-base font-medium mb-1">
+                {isStopped ? "Roll Up Status" : "Next Sync In"}
+              </h3>
+              <div className={cn(
+                "text-2xl font-medium",
+                isStopped ? "text-red-600" : "text-green-600"
+              )}>
+                {isStopped ? "System Forcibly Stopped" : `${nextSync} blocks remaining`}
+              </div>
             </div>
+            {!isStopped && (
+              <Button 
+                variant="destructive" 
+                onClick={handleStop}
+              >
+                Force Stop
+              </Button>
+            )}
           </div>
 
-          {/* 区块同步进度 */}
+          {/* Block sync progress */}
           <div>
             <div className="flex justify-between mb-3">
-              <span className="text-sm">当前同步进度</span>
-              <span className="text-sm text-muted-foreground">100个区块</span>
+              <span className="text-sm">Current sync progress</span>
+              <span className="text-sm text-muted-foreground">100 blocks</span>
             </div>
             <Heatmap 
               data={blockProgress}
               max={100}
               columns={20}
               type="progress"
-              currentProgress={53}
+              currentProgress={isStopped ? currentBlock - 1 : currentBlock}
               className="w-full"
               animate={showAnimation}
             />
           </div>
 
-          {/* 系统稳定性 */}
+          {/* System stability */}
           <div>
             <div className="flex justify-between mb-3">
-              <span className="text-sm">系统稳定运行状态</span>
-              <span className="text-sm text-muted-foreground">最近90天</span>
+              <span className="text-sm">System stability status</span>
+              <span className="text-sm text-muted-foreground">Last 90 days</span>
             </div>
             <Heatmap 
               data={systemUptime}
@@ -157,6 +214,51 @@ export default function StatusPage() {
               <span className="text-xs text-muted-foreground">More</span>
             </div>
           </div>
+
+          {/* Add confirmation dialogs */}
+          <Dialog open={showStopDialog} onOpenChange={setShowStopDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Stop</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to force stop the Roll Up? This may result in data inconsistency.
+                </DialogDescription>
+              </DialogHeader>
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  This action requires Governor approval and cannot be undone.
+                </AlertDescription>
+              </Alert>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowStopDialog(false)}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleStopConfirm}>
+                  Confirm Stop
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Governor Confirmation</DialogTitle>
+                <DialogDescription>
+                  Please enter Governor key for secondary confirmation
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleFinalConfirm}>
+                  Confirm
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </Card>
     </div>

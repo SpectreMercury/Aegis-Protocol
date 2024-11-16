@@ -23,10 +23,8 @@ export function Heatmap({
 
   useEffect(() => {
     if (animate && type === 'progress') {
-      // 重置
       setActiveIndex(-1);
       
-      // 开始动画
       let index = 0;
       const timer = setInterval(() => {
         if (index < currentProgress) {
@@ -35,7 +33,7 @@ export function Heatmap({
         } else {
           clearInterval(timer);
         }
-      }, 50); // 每50ms点亮一个
+      }, 50);
 
       return () => clearInterval(timer);
     }
@@ -49,14 +47,18 @@ export function Heatmap({
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
         }}
       >
-        {data.map((_, index) => (
+        {data.map((value, index) => (
           <div
             key={index}
             className={cn(
               "aspect-square rounded-sm",
-              type === 'progress' 
-                ? (index <= activeIndex ? "bg-green-500" : "bg-neutral-200")
-                : "bg-green-500"
+              {
+                "bg-red-500": value < 0,
+                "bg-green-500": (type === 'progress' && (index <= activeIndex || value > 0)) || 
+                               (type === 'status' && value > 0),
+                "bg-neutral-200": (type === 'progress' && index > activeIndex && value === 0) ||
+                                 (type === 'status' && value === 0),
+              }
             )}
             style={{ 
               minWidth: '12px', 

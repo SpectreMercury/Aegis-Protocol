@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TokenETH, TokenUSDC, TokenUSDT, TokenDAI, IconComponentProps } from '@web3icons/react';
-import { ArrowLeft, ChevronDown, Settings, ArrowDown, Check, Search, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, Settings, ArrowDown, Check, Search } from "lucide-react";
 import Link from "next/link";
 import { ForwardRefExoticComponent, RefAttributes, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
