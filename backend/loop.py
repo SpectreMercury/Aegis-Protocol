@@ -120,7 +120,7 @@ def update_merkle(contract, key_id: int, balances: Dict[str, int]):
         ).build_transaction({
             'from': Account.from_key(os.getenv('PRIVATE_KEY')).address,
             'nonce': w3.eth.get_transaction_count(Account.from_key(os.getenv('PRIVATE_KEY')).address),
-            'gas': 200000,
+            'gas': 900000, # Increased gas limit
             'gasPrice': w3.eth.gas_price
         })
         # Sign and send transaction

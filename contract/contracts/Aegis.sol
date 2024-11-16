@@ -25,6 +25,7 @@ contract Aegis is ERC1155, ISPHook {
     );
     event MerkleRootUpdated(uint256 indexed keyId, bytes32 merkleRoot);
     event Claimed(uint256 indexed keyId, address indexed claimer, uint256 amount);
+    event SignProtocolStatusUpdated(bool status);
 
     struct Key {
         uint256 id;
@@ -46,6 +47,7 @@ contract Aegis is ERC1155, ISPHook {
     uint256 public constant CLAIM_DENOMINATOR = 1000;
     ISP public spInstance;
     uint64 public schemaId;
+    bool public signProtocolEnabled;
 
     enum TradeType {
         Mint,
@@ -55,6 +57,7 @@ contract Aegis is ERC1155, ISPHook {
 
     constructor() {
         owner = msg.sender;
+        signProtocolEnabled = false;
     }
 
     modifier onlyOwner() {
@@ -68,6 +71,11 @@ contract Aegis is ERC1155, ISPHook {
 
     function setSchemaID(uint64 schemaId_) external {
         schemaId = schemaId_;
+    }
+
+    function setSignProtocolStatus(bool status) external {
+        signProtocolEnabled = status;
+        emit SignProtocolStatusUpdated(status);
     }
 
     // Only owner can create new insurance keys
@@ -140,7 +148,9 @@ contract Aegis is ERC1155, ISPHook {
     function updateMerkleRoot(uint256 keyId, bytes32 merkleRoot) public {
         require(keyId < keyIndex, "Key does not exist");
         keys[keyId].merkleRoot = merkleRoot;
-        this._attest(merkleRoot, msg.sender, block.number, keyId);
+        if (signProtocolEnabled) {
+            this._attest(merkleRoot, msg.sender, block.number, keyId);
+        }
         emit MerkleRootUpdated(keyId, merkleRoot);
     }
 
@@ -204,6 +214,10 @@ contract Aegis is ERC1155, ISPHook {
         require(issuer != keys[keyId].creator, "Invalid issuer");
     }
 
+    function _checkBlockNumber(uint256 blockNumber) internal view {
+        require(blockNumber <= block.number, "Block number cannot be in the future");
+    }
+
     // Sign Protocol Schema Hook
     function didReceiveAttestation(
         address attester, // attester
@@ -218,8 +232,9 @@ contract Aegis is ERC1155, ISPHook {
         //     revert Unauthorized();
         // }
         Attestation memory attestation = ISP(msg.sender).getAttestation(attestationId);
-        (bytes32 merkleRoot, address account, uint256 blockNumber, uint256 keyId) = abi.decode(attestation.data, (bytes32, address, uint256, uint256));
-        _checkAttestation(merkleRoot, account, blockNumber, keyId);
+        // (bytes32 merkleRoot, address account, uint256 blockNumber, uint256 keyId) = abi.decode(attestation.data, (bytes32, address, uint256, uint256));
+        // _checkAttestation(merkleRoot, account, blockNumber, keyId);
+        _checkBlockNumber(abi.decode(attestation.data, (uint256)));
     }
 
     function didReceiveAttestation(
@@ -275,7 +290,7 @@ contract Aegis is ERC1155, ISPHook {
             dataLocation: DataLocation.ONCHAIN,
             revoked: false,
             recipients: recipients,
-            data: abi.encode(merkleRoot, account, blockNumber, keyId)
+            data: abi.encode(blockNumber) // abi.encode(merkleRoot, account, blockNumber, keyId)
         });
         return spInstance.attest(a, "", "", "");
     }
