@@ -9,6 +9,7 @@ import { Types } from "src/libraries/Types.sol";
 
 // Interfaces
 import { ISemver } from "src/universal/interfaces/ISemver.sol";
+import { ISuperchainConfig } from "src/L1/interfaces/ISuperchainConfig.sol";
 
 /// @custom:proxied true
 /// @title L2OutputOracle
@@ -45,6 +46,10 @@ contract L2OutputOracle is Initializable, ISemver {
     /// @custom:network-specific
     uint256 public finalizationPeriodSeconds;
 
+    /// @notice Contract of the Superchain Config.
+    ISuperchainConfig public superchainConfig;
+
+
     /// @notice Emitted when an output is proposed.
     /// @param outputRoot    The output root.
     /// @param l2OutputIndex The index of the output in the l2Outputs array.
@@ -73,7 +78,8 @@ contract L2OutputOracle is Initializable, ISemver {
             _startingTimestamp: 0,
             _proposer: address(0),
             _challenger: address(0),
-            _finalizationPeriodSeconds: 0
+            _finalizationPeriodSeconds: 0,
+            _superchainConfig: ISuperchainConfig(address(0))
         });
     }
 
@@ -86,6 +92,7 @@ contract L2OutputOracle is Initializable, ISemver {
     /// @param _challenger          The address of the challenger.
     /// @param _finalizationPeriodSeconds The minimum time (in seconds) that must elapse before a withdrawal
     ///                                   can be finalized.
+    /// @param _superchainConfig    The Superchain Config contract.
     function initialize(
         uint256 _submissionInterval,
         uint256 _l2BlockTime,
@@ -93,7 +100,8 @@ contract L2OutputOracle is Initializable, ISemver {
         uint256 _startingTimestamp,
         address _proposer,
         address _challenger,
-        uint256 _finalizationPeriodSeconds
+        uint256 _finalizationPeriodSeconds,
+        ISuperchainConfig _superchainConfig
     )
         public
         initializer
@@ -104,6 +112,10 @@ contract L2OutputOracle is Initializable, ISemver {
             _startingTimestamp <= block.timestamp,
             "L2OutputOracle: starting L2 timestamp must be less than current time"
         );
+        require(
+            address(_superchainConfig) != address(0),
+            "L2OutputOracle: superchain config cannot be zero address"
+        );
 
         submissionInterval = _submissionInterval;
         l2BlockTime = _l2BlockTime;
@@ -112,6 +124,7 @@ contract L2OutputOracle is Initializable, ISemver {
         proposer = _proposer;
         challenger = _challenger;
         finalizationPeriodSeconds = _finalizationPeriodSeconds;
+        superchainConfig = _superchainConfig;
     }
 
     /// @notice Getter for the submissionInterval.
@@ -198,6 +211,8 @@ contract L2OutputOracle is Initializable, ISemver {
         external
         payable
     {
+        require(!superchainConfig.paused(), "L2OutputOracle: paused");
+        
         require(msg.sender == proposer, "L2OutputOracle: only the proposer address can propose new outputs");
 
         require(

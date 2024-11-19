@@ -45,7 +45,8 @@ make devnet-clean
 packages/contracts-bedrock/src/L1/OptimismPortal2.sol
 packages/contracts-bedrock/src/L1/interfaces/IOptimismPortal2.sol
 packages/contracts-bedrock/src/L1/interfaces/IOptimismPortalInterop.sol
-
+optimism/packages/contracts-bedrock/src/L1/L2OutputOracle.sol
+暂停之后，暂停 rollup stateRoot 
 
 # 调用 pause unpause
 ### 权限控制
